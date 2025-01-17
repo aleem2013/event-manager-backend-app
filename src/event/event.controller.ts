@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Param, Put, UseGuards } from '@nestjs/comm
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { Role } from 'src/auth/role.enum';
-import { Roles } from 'src/auth/roles.decorator';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
+import { RolesGuard } from '../auth/roles.guard';
+import { Role } from '../auth/role.enum';
+import { Roles } from '../auth/roles.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('events')
 @Controller('events')
