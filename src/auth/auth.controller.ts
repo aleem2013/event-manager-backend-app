@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, UnauthorizedException, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
@@ -10,8 +10,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'User login' })
-  async login(@Body() loginDto: LoginDto) {
+  async login(@Body() loginDto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.authService.validateUser(
       loginDto.email,
       loginDto.password,

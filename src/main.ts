@@ -7,6 +7,10 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // JSON middleware
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+
   // Enable CORS
   app.enableCors({
     origin: '*',//['http://localhost:5173','https://your-frontend-domain.vercel.app'], // Your frontend URL
@@ -19,6 +23,12 @@ async function bootstrap() {
 
 
   app.useGlobalPipes(new ValidationPipe());
+
+  // Force JSON content type for all responses
+  app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'application/json');
+    next();
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Event Management API')
