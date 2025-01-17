@@ -9,7 +9,7 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: 'http://localhost:5173', // Your frontend URL
+    origin: '*',//['http://localhost:5173','https://your-frontend-domain.vercel.app'], // Your frontend URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
