@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsNumber, IsString, IsUrl, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateEventDto {
@@ -16,4 +16,20 @@ export class CreateEventDto {
   @IsNotEmpty()
   @IsUrl()
   googleMapsUrl: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  @Min(1)
+  numberOfDays: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsDateString()
+  startDate: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsDateString()
+  endDate: string;
 }

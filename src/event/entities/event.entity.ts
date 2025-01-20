@@ -22,6 +22,15 @@ export class Event {
   @Column()
   shortUrl: string;
 
+  @Column()
+  numberOfDays: number;
+
+  @Column({ type: 'timestamp' })
+  startDate: Date;
+
+  @Column({ type: 'timestamp' })
+  endDate: Date;
+
   @ManyToOne(() => User, user => user.organizedEvents)
   organizer: User;
 
