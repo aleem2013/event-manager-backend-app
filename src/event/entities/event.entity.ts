@@ -22,13 +22,13 @@ export class Event {
   @Column()
   shortUrl: string;
 
-  @Column()
+  @Column({default: 1})
   numberOfDays: number;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   startDate: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   endDate: Date;
 
   @ManyToOne(() => User, user => user.organizedEvents)

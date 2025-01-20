@@ -18,18 +18,18 @@ export class CreateEventDto {
   googleMapsUrl: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  //@IsNotEmpty()
   @IsNumber()
   @Min(1)
   numberOfDays: number;
 
   @ApiProperty()
-  @IsNotEmpty()
+  //@IsNotEmpty()
   @IsDateString()
   startDate: string;
 
   @ApiProperty()
-  @IsNotEmpty()
+  //@IsNotEmpty()
   @IsDateString()
   endDate: string;
 }
