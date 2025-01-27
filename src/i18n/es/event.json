@@ -1,11 +1,16 @@
 {
+  "event": {
     "EVENT": {
-      "NOT_FOUND": "Event not found",
       "CREATED": "Event created successfully",
+      "RETRIEVED": "Event details retrieved successfully",
+      "NOT_FOUND": "Event not found",
+      "LIST_SUCCESS": "Events retrieved successfully",
       "TICKET": {
         "CREATED": "Ticket created successfully",
+        "RETRIEVED": "Ticket details retrieved successfully",
         "NOT_FOUND": "Ticket not found",
         "ATTENDANCE_MARKED": "Attendance marked successfully"
       }
     }
+  }
 }

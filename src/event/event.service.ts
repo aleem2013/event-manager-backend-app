@@ -8,6 +8,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import * as QRCode from 'qrcode';
 import { randomBytes } from 'crypto';
 import { I18nService } from 'nestjs-i18n';
+import { EventListResponse, EventResponse, TicketResponse } from 'src/interfaces/response.interface';
 
 
 @Injectable()
@@ -29,36 +30,36 @@ export class EventService {
   }
 
   // Fetch all Events
-  async getAllEvents(): Promise<Event[]> {
-    return this.eventRepository.find({
+  async getAllEvents(): Promise<EventListResponse> {
+    const events = await this.eventRepository.find({
       relations: ['tickets'],
       order: {
-        // Assuming you want newest events first
         id: 'DESC',
       },
     });
+    
+    return {
+      data: events,
+      message: await this.i18n.translate('event.EVENT.LIST_SUCCESS')
+    };
   }
 
-  async createEvent(createEventDto: CreateEventDto): Promise<Event> {
+  async createEvent(createEventDto: CreateEventDto): Promise<EventResponse> {
     const event = new Event();
     Object.assign(event, createEventDto);
     
-    // Generate short URL using crypto instead of nanoid
     const shortId = this.generateShortId();
     event.shortUrl = `${process.env.BASE_URL}/e/${shortId}`;
-    
-    // Generate QR code
     event.qrCodeUrl = await QRCode.toDataURL(event.shortUrl);
-
-    const savedEvent = await this.eventRepository.save(event);
     
+    const savedEvent = await this.eventRepository.save(event);
     return {
-      ...savedEvent,
+      data: savedEvent,
       message: await this.i18n.translate('event.EVENT.CREATED')
     };
   }
 
-  async getEventDetails(eventId: string): Promise<Event> {
+  async getEventDetails(eventId: string): Promise<EventResponse> {
     const event = await this.eventRepository.findOne({
       where: { id: eventId },
       relations: ['tickets'],
@@ -70,11 +71,13 @@ export class EventService {
       );
     }
     
-    return event;
+    return {
+      data: event,
+      message: await this.i18n.translate('event.EVENT.RETRIEVED')
+    };
   }
 
-  async getTicketDetails(eventId: string, ticketId: string): Promise<Ticket> {
-    console.log("eventId "+eventId);
+  async getTicketDetails(eventId: string, ticketId: string): Promise<TicketResponse> {
     const ticket = await this.ticketRepository.findOne({
       where: { 
         id: ticketId,
@@ -89,11 +92,13 @@ export class EventService {
       );
     }
     
-    return ticket;
+    return {
+      data: ticket,
+      message: await this.i18n.translate('event.EVENT.TICKET.RETRIEVED')
+    };
   }
 
-  async getTicketDetailsByTicketId(ticketId: string): Promise<Ticket> {
-    //console.log("eventId "+eventId);
+  async getTicketDetailsByTicketId(ticketId: string): Promise<TicketResponse> {
     const ticket = await this.ticketRepository.findOne({
       where: { 
         id: ticketId
@@ -107,29 +112,37 @@ export class EventService {
       );
     }
     
-    return ticket;
+    return {
+      data: ticket,
+      message: await this.i18n.translate('event.EVENT.TICKET.RETRIEVED')
+    };
   }
 
-  async createTicket(eventId: string): Promise<Ticket> {
-      const event = await this.getEventDetails(eventId);
+  async createTicket(eventId: string): Promise<TicketResponse> {
+    const event = await this.eventRepository.findOne({
+      where: { id: eventId },
+      relations: ['tickets'],
+    });
+
+    if (!event) {
+      throw new NotFoundException(
+        await this.i18n.translate('event.EVENT.NOT_FOUND')
+      );
+    }
       
-      const ticket = new Ticket();
-      ticket.event = event;
-      ticket.ticketNumber = this.generateTicketNumber();
-      
-      // Save the ticket first to get the ID
-      const savedTicket = await this.ticketRepository.save(ticket);
-      
-      // Generate frontend URL instead of API URL
-      savedTicket.attendanceUrl = `${process.env.BASE_URL}/scan?ticketId=${savedTicket.id}`;
-      savedTicket.qrCodeUrl = await QRCode.toDataURL(savedTicket.attendanceUrl);
-      
-      // Save again with the updated URLs
-      const finalTicket = await this.ticketRepository.save(savedTicket);
-      return {
-        ...finalTicket,
-        message: await this.i18n.translate('event.EVENT.TICKET.CREATED')
-      };
+    const ticket = new Ticket();
+    ticket.event = event;
+    ticket.ticketNumber = this.generateTicketNumber();
+    
+    const savedTicket = await this.ticketRepository.save(ticket);
+    savedTicket.attendanceUrl = `${process.env.BASE_URL}/scan?ticketId=${savedTicket.id}`;
+    savedTicket.qrCodeUrl = await QRCode.toDataURL(savedTicket.attendanceUrl);
+    
+    const finalTicket = await this.ticketRepository.save(savedTicket);
+    return {
+      data: finalTicket,
+      message: await this.i18n.translate('event.EVENT.TICKET.CREATED')
+    };
   }
 
   // async createTicket(eventId: string): Promise<Ticket> {
@@ -164,7 +177,7 @@ export class EventService {
   //   return this.ticketRepository.save(ticket);
   // }
 
-  async markAttendance(ticketId: string): Promise<Ticket> {
+  async markAttendance(ticketId: string): Promise<TicketResponse> {
     const ticket = await this.ticketRepository.findOne({
       where: { id: ticketId },
     });
@@ -180,7 +193,7 @@ export class EventService {
     
     const savedTicket = await this.ticketRepository.save(ticket);
     return {
-      ...savedTicket,
+      data: savedTicket,
       message: await this.i18n.translate('event.EVENT.TICKET.ATTENDANCE_MARKED')
     };
   }
