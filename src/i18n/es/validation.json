@@ -1,0 +1,17 @@
+{
+    "validation": {
+      "EMAIL": {
+        "INVALID": "Please provide a valid email address"
+      },
+      "PASSWORD": {
+        "STRING": "Password must be a string",
+        "MIN_LENGTH": "Password must be at least {constraints.0} characters long"
+      },
+      "FIRSTNAME": {
+        "STRING": "First name must be a string"
+      },
+      "LASTNAME": {
+        "STRING": "Last name must be a string"
+      }
+    }
+  }

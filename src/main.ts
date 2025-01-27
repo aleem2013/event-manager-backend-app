@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express'; 
+import { I18nValidationPipe } from 'nestjs-i18n';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,7 +24,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new I18nValidationPipe());
 
   // Force JSON content type for all responses
   app.use((req, res, next) => {

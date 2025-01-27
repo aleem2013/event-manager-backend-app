@@ -7,6 +7,7 @@ import { Ticket } from './entities/ticket.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import * as QRCode from 'qrcode';
 import { randomBytes } from 'crypto';
+import { I18nService } from 'nestjs-i18n';
 
 
 @Injectable()
@@ -16,6 +17,7 @@ export class EventService {
     private eventRepository: Repository<Event>,
     @InjectRepository(Ticket)
     private ticketRepository: Repository<Ticket>,
+    private i18n: I18nService,
   ) {}
 
   private generateShortId(length: number = 8): string {
@@ -47,8 +49,13 @@ export class EventService {
     
     // Generate QR code
     event.qrCodeUrl = await QRCode.toDataURL(event.shortUrl);
+
+    const savedEvent = await this.eventRepository.save(event);
     
-    return this.eventRepository.save(event);
+    return {
+      ...savedEvent,
+      message: await this.i18n.translate('event.EVENT.CREATED')
+    };
   }
 
   async getEventDetails(eventId: string): Promise<Event> {
@@ -58,7 +65,9 @@ export class EventService {
     });
     
     if (!event) {
-      throw new NotFoundException('Event not found');
+      throw new NotFoundException(
+        await this.i18n.translate('event.EVENT.NOT_FOUND')
+      );
     }
     
     return event;
@@ -75,7 +84,9 @@ export class EventService {
     });
     
     if (!ticket) {
-      throw new NotFoundException('Ticket not found');
+      throw new NotFoundException(
+        await this.i18n.translate('event.EVENT.TICKET.NOT_FOUND')
+      );
     }
     
     return ticket;
@@ -91,7 +102,9 @@ export class EventService {
     });
     
     if (!ticket) {
-      throw new NotFoundException('Ticket not found');
+      throw new NotFoundException(
+        await this.i18n.translate('event.EVENT.TICKET.NOT_FOUND')
+      );
     }
     
     return ticket;
@@ -112,7 +125,11 @@ export class EventService {
       savedTicket.qrCodeUrl = await QRCode.toDataURL(savedTicket.attendanceUrl);
       
       // Save again with the updated URLs
-      return this.ticketRepository.save(savedTicket);
+      const finalTicket = await this.ticketRepository.save(savedTicket);
+      return {
+        ...finalTicket,
+        message: await this.i18n.translate('event.EVENT.TICKET.CREATED')
+      };
   }
 
   // async createTicket(eventId: string): Promise<Ticket> {
@@ -153,12 +170,18 @@ export class EventService {
     });
     
     if (!ticket) {
-      throw new NotFoundException('Ticket not found');
+      throw new NotFoundException(
+        await this.i18n.translate('event.EVENT.TICKET.NOT_FOUND')
+      );
     }
     
     ticket.attended = true;
     ticket.attendanceTimestamp = new Date();
     
-    return this.ticketRepository.save(ticket);
+    const savedTicket = await this.ticketRepository.save(ticket);
+    return {
+      ...savedTicket,
+      message: await this.i18n.translate('event.EVENT.TICKET.ATTENDANCE_MARKED')
+    };
   }
 }

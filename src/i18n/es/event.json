@@ -1,0 +1,11 @@
+{
+    "EVENT": {
+      "NOT_FOUND": "Event not found",
+      "CREATED": "Event created successfully",
+      "TICKET": {
+        "CREATED": "Ticket created successfully",
+        "NOT_FOUND": "Ticket not found",
+        "ATTENDANCE_MARKED": "Attendance marked successfully"
+      }
+    }
+}
